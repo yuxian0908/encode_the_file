@@ -93,7 +93,11 @@ public class MyPriorityQueue<T extends Comparable<T>> {
 	}
 	
 	public void printTree() {
-		System.out.println(store.toString());
+		ArrayList<String> printer = new ArrayList<>();
+		for(int i=0; i<store.size(); i++) {
+			printer.add(store.get(i).toString());
+		}
+		System.out.println(printer.toString());
 	}
 	
 	public void insertAry(T[] ary) {
@@ -102,7 +106,7 @@ public class MyPriorityQueue<T extends Comparable<T>> {
 		}
 	}
 	
-	public T deletenth(int n) {
+	public T deleteNth(int n) {
 		ArrayList<T> temp = new ArrayList<>();
 		for(int i=0; i<n-1; i++) {
 			temp.add(deleteFirst());
@@ -112,6 +116,14 @@ public class MyPriorityQueue<T extends Comparable<T>> {
 			insert(temp.get(i));
 		}
 		return res;
+	}
+	
+	public int size() {
+		return size;
+	}
+	
+	public boolean isEmpty() {
+		return size==0;
 	}
 	
 	public static void main(String[] args) {
@@ -134,7 +146,7 @@ public class MyPriorityQueue<T extends Comparable<T>> {
 		System.out.println(test.deleteFirst());
 		System.out.println(test.deleteFirst());
 		test.printTree();
-		System.out.println(test.deletenth(4));
+		System.out.println(test.deleteNth(4));
 		test.printTree();
 	}
 }

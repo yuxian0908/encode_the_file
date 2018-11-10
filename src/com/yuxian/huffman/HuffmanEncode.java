@@ -1,6 +1,7 @@
 package com.yuxian.huffman;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Stack;
 
 public class HuffmanEncode {
 	
@@ -30,6 +31,15 @@ public class HuffmanEncode {
 			queue.insert(new HuffmanNode(small1, small2));
 		}
 		return queue.deleteFirst();
+	}
+	
+	public static int[] getFreqAry(String str) {
+		int[] res = new int[256];
+		for(char c: str.toCharArray()) {
+			res[c]++;
+		}
+		
+		return res;
 	}
 	
 	public static void printCode(HuffmanTree tree, StringBuilder prefix) {
@@ -69,21 +79,97 @@ public class HuffmanEncode {
 		}
 	}
 	
-	public static int[] getFreqAry(String str) {
-		int[] res = new int[256];
-		for(char c: str.toCharArray()) {
-			res[c]++;
+	private static class CodeNode{
+		HuffmanTree node;
+		String prefix;
+		public CodeNode(HuffmanTree node, StringBuilder prefix) {
+			this.node = node;
+			this.prefix = prefix.toString();
 		}
+	}
+	
+	public static HashMap<Character, String> getCodeMap(HuffmanTree tree){
+		//psuedo code
+		/*
+		 * class CodeNode{
+		 * 		HuffmanTree node;
+		 * 		StringBuilder prefix;
+		 * }
+		 * 
+		 * CodeNode root = new CodeNode(tree, prefix)
+		 * 
+		 * Stack store = new Stack()
+		 * store.put(root)
+		 * 
+		 * while(store is not empty){
+		 * 		temp = store.pop()
+		 * 		if(temp.node instanceof HuffmanLeaf){
+		 * 			map.put()
+		 * 		}else if{
+		 * 			store.put(new CodeNode(tree.left, prefix))
+		 * 			store.put(new CodeNode(tree.right, prefix))
+		 * 		}
+		 * }
+		 * 
+		 * */
 		
-		return res;
+		HashMap<Character, String> header = new HashMap<>();
+		StringBuilder prefix = new StringBuilder();
+		CodeNode root = new CodeNode(tree, prefix);
+		Stack<CodeNode> store = new Stack<>();
+		store.push(root);
+		while(!store.isEmpty()) {
+			CodeNode temp = store.pop();
+			if(temp.node instanceof HuffmanLeaf) {
+				
+				HuffmanLeaf leaf = (HuffmanLeaf) temp.node;
+				StringBuilder p = new StringBuilder(temp.prefix);
+				header.put(leaf.val, p.toString());
+				
+			}else if(temp.node instanceof HuffmanNode) {
+				
+				HuffmanNode node = (HuffmanNode) temp.node;
+				StringBuilder p = new StringBuilder(temp.prefix);
+				p.append("0");
+				store.push(new CodeNode(node.left, p));
+				p.deleteCharAt(p.length()-1);
+				p.append("1");
+				store.push(new CodeNode(node.right, p));
+				p.deleteCharAt(p.length()-1);
+				
+			}
+		}
+		return header;
+	}
+
+	
+	public static String encode(String origin, HashMap<Character, String> header) {
+		StringBuilder res = new StringBuilder();
+		for(char c: origin.toCharArray()) {
+			res.append(header.get(c));
+		}
+		return res.toString();
 	}
 	
 	public static void main(String[] args) {
-		int[] test = getFreqAry("this is an example for huffman encoding");
-		HuffmanTree res = buildFreqTree(test);
+		
+		// test input
+		String test = "this is an example for huffman encoding";
+		
+		// get frequency ary
+		int[] freqAry = getFreqAry(test);
+		HuffmanTree freqTree = buildFreqTree(freqAry);
+		
+		// print header
 		System.out.println("char\tfreqs\tcode");
-		printCode(res, new StringBuilder());
+		printCode(freqTree, new StringBuilder());
+		
+		// store header in map
+		HashMap<Character, String> header = getCodeMap(freqTree);
+		System.out.println(test);
+		System.out.println(encode(test, header));
 	}
+	
 }
 
 

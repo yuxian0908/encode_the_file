@@ -87,6 +87,37 @@ public class HuffmanEncode {
 			this.prefix = prefix.toString();
 		}
 	}
+
+	public static String getCodeHeader(HuffmanTree tree){
+		
+		StringBuilder header = new StringBuilder();
+		StringBuilder prefix = new StringBuilder();
+		CodeNode root = new CodeNode(tree, prefix);
+		Stack<CodeNode> store = new Stack<>();
+		store.push(root);
+		while(!store.isEmpty()) {
+			CodeNode temp = store.pop();
+			if(temp.node instanceof HuffmanLeaf) {
+				
+				HuffmanLeaf leaf = (HuffmanLeaf) temp.node;
+				StringBuilder p = new StringBuilder(temp.prefix);
+				header.append(leaf.val+":"+p.toString()+",");
+				
+			}else if(temp.node instanceof HuffmanNode) {
+				
+				HuffmanNode node = (HuffmanNode) temp.node;
+				StringBuilder p = new StringBuilder(temp.prefix);
+				p.append("0");
+				store.push(new CodeNode(node.left, p));
+				p.deleteCharAt(p.length()-1);
+				p.append("1");
+				store.push(new CodeNode(node.right, p));
+				p.deleteCharAt(p.length()-1);
+				
+			}
+		}
+		return header.toString();
+	}
 	
 	public static HashMap<Character, String> getCodeMap(HuffmanTree tree){
 		//psuedo code
@@ -158,6 +189,8 @@ public class HuffmanEncode {
 		
 		// get frequency ary
 		int[] freqAry = getFreqAry(test);
+		
+		// get header Tree
 		HuffmanTree freqTree = buildFreqTree(freqAry);
 		
 		// print header
@@ -167,6 +200,10 @@ public class HuffmanEncode {
 		// store header in map
 		HashMap<Character, String> header = getCodeMap(freqTree);
 		System.out.println(test);
+		
+		// get header string
+		String header_str = getCodeHeader(freqTree);
+		System.out.println(header_str);
 		System.out.println(encode(test, header));
 	}
 	
